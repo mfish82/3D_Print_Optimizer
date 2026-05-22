@@ -274,6 +274,7 @@ settings (`["value1", "value2", ...]`) which the current patch format doesn't ma
 | `improvement_agent.md` | Inline improvement agent — auto-updates SKILL.md and patch profiles per outcome |
 | `apply_patch.py` | Python tool — reads, writes, and audits Bambu 3MF settings |
 | `patches/` | Per-material patch profiles, auto-refined by improvement agent |
+| `references/bambu-studio.md` | Bambu Studio 2.5.3.61 settings reference (process panel locations, base cuts, support behavior) |
 | `tests/` | pytest suite for apply_patch.py and improvement loop logic |
 | `design.md` | Design spec and architecture notes |
 
@@ -330,6 +331,13 @@ All tests use a minimal synthetic 3MF — no real print files required.
 ---
 
 ## Changelog
+
+### v0.5 — 2026-05-22
+- **Self-contained** — no longer depends on `3d-print-master` skill. All domain knowledge inlined.
+- Added `## Mesh Pre-Flight Reference` section: CAD vs scan detection, scan mesh flags, correct prep order, tool quick-ref
+- Added `## Printer & Filament Baselines` section: P2S specs, PLA/PETG/TPU baseline settings tables
+- Optimize mode Step 1 replaced: inline mesh pre-flight (no external skill invocation)
+- Added `references/bambu-studio.md`: Bambu Studio 2.5.3.61 settings reference
 
 ### v0.4 — 2026-05-22
 - Feedback mode captures `CANCELLED` outcome type (stopped prints) with `stopped_at` tracking

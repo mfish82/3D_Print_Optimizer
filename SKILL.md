@@ -19,15 +19,84 @@ history, and domain expertise to propose and apply settings improvements.
 
 ---
 
+## Mesh Pre-Flight Reference
+
+Run before any visual analysis. No external skill needed — all domain knowledge is in this file.
+
+### CAD vs scan detection
+- **CAD**: clean parametric geometry, uniform topology, hard edges — safe for all operations
+- **Scan**: organic topology, variable triangle density, wavy surfaces, photogrammetry/CT origin — treat with caution
+
+### Scan mesh flags (surface when detected)
+- Non-manifold risk → note: "Bambu will auto-repair; verify in slicer layer preview before printing"
+- High poly (>500K tri) → note: "Recommend MeshLab decimation to ~200K before slicing"
+- Hollowing needed → note: "Use Blender Solidify modifier — Meshmixer Hollow creates two-shell problem on scan meshes"
+- Boolean needed → note: "Use Blender Boolean — Meshmixer crashes on high-poly scans"
+
+### Correct scan mesh prep order (when flags fire)
+1. MeshLab: repair non-manifold edges + fill holes
+2. MeshLab: decimate to ~200K triangles if needed
+3. Blender: Solidify modifier for hollowing (thickness in meters, offset -1, uncheck Rim Fill)
+4. Bambu Studio: import, verify repair in slicer preview, then optimize
+
+### Mesh prep tool quick-ref
+| Need | Tool |
+|------|------|
+| Non-manifold repair, hole fill | MeshLab — Filters > Cleaning and Repairing |
+| Hollow / solidify | Blender Solidify modifier |
+| Parametric parts (posts, collars, brackets) | OpenSCAD |
+| Slicer/print settings reference | `references/bambu-studio.md` in this repo |
+
+---
+
+## Printer & Filament Baselines
+
+**Printer:** Bambu Lab P2S | **Nozzle:** 0.4mm hardened steel | **Bed:** Textured PEI | **Bed prep:** Glue stick before each print
+
+### PLA Prototype (Polymaker PolyLite PLA — Cascade Forge default)
+| Setting | Baseline |
+|---------|---------|
+| `layer_height` | 0.20mm |
+| `initial_layer_print_height` | 0.20mm |
+| `nozzle_temperature` | 220°C |
+| `hot_plate_temp` | 65°C |
+| `sparse_infill_density` | 15% |
+| `sparse_infill_pattern` | grid |
+| `wall_loops` | 3 |
+| `support_type` | auto, buildplate only |
+
+### PETG Master (Polymaker PolyMax PETG — mold masters, client work)
+| Setting | Baseline |
+|---------|---------|
+| `layer_height` | 0.12mm |
+| `nozzle_temperature` | 235–242°C |
+| `hot_plate_temp` | 70–80°C |
+| `overhang_fan_speed` | 40–60% |
+| `wall_loops` | 4+ |
+
+### TPU (flexible parts)
+| Setting | Baseline |
+|---------|---------|
+| `nozzle_temperature` | 220–230°C |
+| `hot_plate_temp` | 30–40°C |
+| Retraction | minimal or off |
+| All speeds | 30–40 mm/s max |
+
+---
+
 ## MODE: optimize
 
 Trigger: user provides 3MF path + screenshot (pasted inline) + optional goal.
 Goal defaults to "general" if not stated.
 
-### Step 1 — Invoke 3d-print-master
-Use the Skill tool to invoke `3d-print-master`. Load domain knowledge, pre-flight checklist,
-filament profiles, and Bambu Studio reference. Run the pre-flight visual assessment on the
-screenshot now. Flag any mesh concerns (scan artifacts, non-manifold indicators) before proceeding.
+### Step 1 — Mesh pre-flight
+Using `## Mesh Pre-Flight Reference` and `## Printer & Filament Baselines` above — no external skill needed.
+
+Determine from the screenshot whether the mesh is CAD or scan-derived.
+- CAD: proceed to Step 2
+- Scan indicators detected: surface relevant flags (non-manifold, high poly, hollow/boolean caveats) before continuing
+
+Do not invoke any external skill. All domain knowledge is in this file.
 
 ### Step 2 — Read current settings
 Run: `python "C:\Users\mfish\.claude\skills\bambu-optimizer\apply_patch.py" read "<3mf_path>"`
