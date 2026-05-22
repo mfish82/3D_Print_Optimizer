@@ -270,10 +270,11 @@ settings (`["value1", "value2", ...]`) which the current patch format doesn't ma
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Claude Code skill definition — orchestrates the optimize/feedback workflow |
+| `SKILL.md` | Claude Code skill definition — orchestrates the optimize/feedback/improvement workflow |
+| `improvement_agent.md` | Inline improvement agent — auto-updates SKILL.md and patch profiles per outcome |
 | `apply_patch.py` | Python tool — reads, writes, and audits Bambu 3MF settings |
-| `patches/` | Example patch JSON files for reference |
-| `tests/` | pytest suite for apply_patch.py |
+| `patches/` | Per-material patch profiles, auto-refined by improvement agent |
+| `tests/` | pytest suite for apply_patch.py and improvement loop logic |
 | `design.md` | Design spec and architecture notes |
 
 ---
@@ -303,11 +304,17 @@ The skill reads and writes a Markdown print log so every optimization run is tra
 - Outcome: [PENDING]
 ```
 
-After printing, the feedback mode updates the outcome line:
+After printing, the feedback mode updates the outcome line and **automatically triggers the improvement agent**:
 
 ```
-- Outcome: [SUCCESS] — strong bracket, no warping, supports released cleanly
+- Outcome: [SUCCESS] — strong bracket, no warping, supports released cleanly. Validated: wall_loops:5, support_top_z_distance:0.25mm
+- Outcome: [FAILURE: supports] [PETG] [support_type:tree] — detached at 60%. Worked: walls clean, layer adhesion solid
+- Outcome: [CANCELLED: spaghetti at 35%] [PLA] [stopped_at:35%] [layer_height:0.28mm] — layer shifted. Worked: first 10 layers excellent
 ```
+
+The improvement agent reads your full print history, detects per-material patterns, and updates
+`SKILL.md`'s `## Known Failure Patterns` and `## Material Knowledge` sections automatically.
+Every resolved outcome — including stops and partial prints — feeds the loop.
 
 ---
 
@@ -323,6 +330,20 @@ All tests use a minimal synthetic 3MF — no real print files required.
 ---
 
 ## Changelog
+
+### v0.4 — 2026-05-22
+- Feedback mode captures `CANCELLED` outcome type (stopped prints) with `stopped_at` tracking
+- Every outcome now records `Worked:` / `Validated:` annotations — extracts positive signals even from failures
+- Improvement agent extracts `[partial-validated]` settings from `Worked:` annotations on FAILURE/CANCELLED entries
+- Material Knowledge blocks now track partial-validated settings and CANCELLED counts separately
+
+### v0.3 — 2026-05-22
+- **Continuous improvement loop**: every resolved feedback outcome auto-invokes `improvement_agent.md`
+- `improvement_agent.md`: 8-step inline agent reads print history, updates `SKILL.md` sections, refines patch profiles, and commits — no manual steps
+- `SKILL.md`: added `## Known Failure Patterns` and `## Material Knowledge` auto-updated sections
+- Feedback mode Step 5 added — improvement agent runs inline after every log save
+- `C:\Users\mfish\.claude\skills\bambu-optimizer\` is now a directory junction → repo (single source of truth)
+- Added `tests/test_improvement_loop.py` with fixture-based verification of log parsing and anchor integrity
 
 ### v0.2 — 2026-05-21
 - `apply_patch.py`: added `review` mode — full settings audit with per-category warning flags
