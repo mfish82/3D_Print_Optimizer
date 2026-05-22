@@ -2,4 +2,16 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+
+# 3MF files (client files, test fixtures, optimized outputs)
 *.3mf
+
+# Temp patch files generated during workflow
+*_patch_*.json
+*.tmp
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
