@@ -4,8 +4,8 @@
 
 ## Printer
 printer: P2S
-# Your Bambu printer model. Matching reference at references/printers/<model>.md
-# Supported: P2S, X1C, A1, A1Mini (add more by creating the reference file)
+# Your Bambu printer model — e.g. P2S, X1C, A1, A1Mini, H2D, or any other Bambu model.
+# Claude uses this for context. Any Bambu model works; the feedback loop learns your specific printer over time.
 
 ## Paths
 skill_dir: C:\Users\YOUR_USERNAME\.claude\skills\bambu-optimizer

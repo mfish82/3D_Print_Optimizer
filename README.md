@@ -4,8 +4,8 @@ A Claude Code skill + Python tool that reads Bambu Studio `.3mf` project files, 
 print settings against a screenshot and your print history, proposes optimized settings as
 a human-readable diff, and writes an `_optimized.3mf` on approval.
 
-***NOTE: I JUST STARTED TO BUILD THIS OUT AND ONLY TUNES FOR BAMBU STUDIO WITH PLANS TO TEST ON ORCA SLICER AS WELL. OPEN TO FEEDBACK, FORKS, UPDATES, WHATEVER.
-SO MANY OF US USE AI TO ANALYZE AND GIVE US OPTIMAL SETTINGS FOR OUR PRINTS, THIS IS MY ATTEMPT AT A SELF IMPROVING SKILL TO AID IN THAT EFFORT. THIS DOES REQUIRE THE USE OF A NOTE TAKING/BRAIN STYLE APP LIKE OBSIDIAN***
+> Built for Bambu Studio. Orca Slicer support planned. Open to feedback, forks, and contributions.
+> Print history can live anywhere — Obsidian vault, Dropbox, local folder, or any markdown file.
 
 **No third-party dependencies** — Python stdlib only (`zipfile`, `json`, `shutil`, `tempfile`).
 
@@ -21,8 +21,12 @@ Claude (SKILL.md orchestrator)
   ├── analyze screenshot + settings    ← generate targeted patch
   ├── show diff → approval loop        ← review before anything is written
   └── apply_patch.py write <file.3mf>  ← write _optimized.3mf
-        ├── append to print-log.md     ← auto-log outcome
-        └── improvement_agent.md       ← update SKILL.md + patches from outcome
+        └── append to print-log.md     ← auto-log outcome as [PENDING]
+
+[after print]
+  └── feedback: <description>
+        ├── update print-log.md outcome ← SUCCESS / FAILURE / PARTIAL / CANCELLED
+        └── improvement_agent.md        ← update SKILL.md + patch profiles, commit to GitHub
 ```
 
 ---
@@ -71,7 +75,7 @@ Open `config.md` and set these four values:
 
 | Field | What to put |
 |-------|------------|
-| `printer` | Your Bambu model — `P2S`, `X1C`, `A1`, `A1Mini` |
+| `printer` | Your Bambu printer model (e.g., `P2S`, `X1C`, `A1`, `A1Mini`, `H2D`) |
 | `skill_dir` | Full path to the `bambu-optimizer` folder you just cloned |
 | `profile_base` | Your BambuStudio user profile directory (see below) |
 | `print_log` | Full path to a markdown file where print history will be logged (will be created if it doesn't exist) |
@@ -327,6 +331,7 @@ settings (`["value1", "value2", ...]`) which the current patch format doesn't ma
 | `SKILL.md` | Claude Code skill definition — orchestrates the optimize/feedback/improvement workflow |
 | `improvement_agent.md` | Inline improvement agent — auto-updates SKILL.md and patch profiles per outcome |
 | `apply_patch.py` | Python tool — reads, writes, and audits Bambu 3MF settings |
+| `config.example.md` | Config template — copy to `config.md` and fill in your values |
 | `patches/` | Per-material patch profiles, auto-refined by improvement agent |
 | `references/bambu-studio.md` | Bambu Studio 2.5.3.61 settings reference (process panel locations, base cuts, support behavior) |
 | `tests/` | pytest suite for apply_patch.py and improvement loop logic |
@@ -376,7 +381,7 @@ Every resolved outcome — including stops and partial prints — feeds the loop
 ## Tests
 
 ```bash
-cd bambu-optimizer
+cd "%USERPROFILE%\.claude\skills\bambu-optimizer"
 python -m pytest tests/ -v
 ```
 
@@ -409,7 +414,7 @@ All tests use a minimal synthetic 3MF — no real print files required.
 - `improvement_agent.md`: 8-step inline agent reads print history, updates `SKILL.md` sections, refines patch profiles, and commits — no manual steps
 - `SKILL.md`: added `## Known Failure Patterns` and `## Material Knowledge` auto-updated sections
 - Feedback mode Step 5 added — improvement agent runs inline after every log save
-- `C:\Users\mfish\.claude\skills\bambu-optimizer\` is now a directory junction → repo (single source of truth)
+- Skill directory is now a directory junction → repo (single source of truth)
 - Added `tests/test_improvement_loop.py` with fixture-based verification of log parsing and anchor integrity
 
 ### v0.2 — 2026-05-21
