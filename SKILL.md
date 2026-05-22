@@ -312,10 +312,11 @@ Offer to run optimize or feedback mode immediately.
 
 <!-- Auto-updated by improvement agent. Do not edit manually. -->
 <!-- Format: - [MATERIAL] [setting_key:value] → description (date) -->
-- [PolyMax PETG] [support_type:tree] → interior tree supports toppled on large organic skull geometry (large flat span, insufficient base contact for height), stopped at 14% (2026-05-18)
-- [PolyMax PETG] [support_speed:150mm/s] → poor column bonding at 0.12mm layer height; weak supports contributed to topple at 14% — use 50mm/s (2026-05-22)
-- [PolyMax PETG] [travel_speed:600mm/s] → layer shifting at 0.12mm layer height on tall geometry; P2S resonance — use 200mm/s (2026-05-22)
+- [PolyMax PETG] [support_type:tree+tree_slim] → toppled at 14% on large organic skull span; tree_slim trunks too thin for height at 0.12mm layers (2026-05-18)
+- [PolyMax PETG] [support_speed:150mm/s] → poor column bonding at fine layer heights — use ≤47mm/s at 0.2mm, ≤79mm/s at 0.12mm (volumetric limit 4mm³/s) (2026-05-22)
+- [PolyMax PETG] [travel_speed:600mm/s] → layer shifting on tall geometry; P2S resonance — use 200mm/s (2026-05-22)
 - [PolyMax PETG] [hot_plate_temp:55°C] → incorrect for Engineering Plate + PolyMax PETG; correct is 70°C (2026-05-22)
+- [PolyMax PETG] [support_style:snug+buildplate_only_off] → generates massive interior fill (17h, 84g) on skull geometry; use tree+critical_regions_only instead (2026-05-22)
 
 ---
 
@@ -327,11 +328,15 @@ Offer to run optimize or feedback mode immediately.
 ### Polymaker PolyMax PETG
 - **Nozzle:** 250°C (attempted 2026-05-18 — partial-validated only)
 - **Bed:** 70°C Engineering Plate (2026-05-18)
-- **Partial-validated (worked in cancelled print):** `wall_loops:6`, `outer_wall_speed:25mm/s`, `layer_height:0.12mm`, `nozzle_temperature:250°C`, first layer adhesion solid (2026-05-18)
-- **Avoid:** `support_type:tree` on large organic flat geometry — tree supports toppled at 14% height
-- **Avoid:** `support_speed` above 80mm/s at 0.12mm layer height — poor column bonding
-- **Avoid:** `travel_speed` above 200mm/s at 0.12mm layer height — layer shifting from resonance
-- **Corrected:** `hot_plate_temp` must be 70°C for Engineering Plate (not 55°C from base profile)
+- **Partial-validated (worked in cancelled print):** `outer_wall_speed:25mm/s`, `nozzle_temperature:250°C`, first layer adhesion solid on Engineering Plate at 70°C (2026-05-18)
+- **v2 planned settings (pending outcome):** tree(auto)+Default style, `critical_regions_only:ON`, `branch_diameter:4mm`, `support_top_z_distance:0.36mm`, `interface_top_layers:0`, `support_speed:40mm/s`, `travel_speed:200mm/s`, `layer_height:0.2mm adaptive`, `wall_loops:4`, `sparse_infill_density:20%`, `hot_plate_temp:70°C`
+- **Volumetric limit:** 4mm³/s max — at 0.2mm/0.42mm line width caps speed at ~47mm/s; at 0.12mm caps at ~79mm/s
+- **Single material only** — Bambu Support for PLA/PETG incompatible at 250°C nozzle temp
+- **Avoid:** `support_style:snug` with buildplate_only OFF — generates massive interior fill on skull geometry
+- **Avoid:** `support_speed` above volumetric cap — poor column bonding
+- **Avoid:** `travel_speed` above 200mm/s — layer shifting from P2S resonance at fine layer heights
+- **Corrected:** `hot_plate_temp` must be 70°C Engineering Plate (base profile defaults to 55°C — always override)
+- **Finishing:** XTC-3D epoxy + sanding — 0.2mm layer height sufficient; 0.12mm is overkill
 - **Outcomes:** 1 total — 0 SUCCESS, 0 FAILURE, 0 PARTIAL, 1 CANCELLED
 
 ### Bambu PLA Basic
