@@ -86,7 +86,51 @@ feedback: perfect print on vase_optimized.3mf — no warping, clean release
 
 ---
 
+## What to Give Claude for Best Results
+
+The more context you provide, the better the recommendations. Below is ranked by impact.
+
+### Minimum (required)
+
+| Input | Why |
+|-------|-----|
+| `.3mf` project file | Contains current settings — optimizer can't run without it |
+| Bambu Studio screenshot | Visual analysis drives support, speed, and layer decisions |
+| Goal or use case | Even one word: `strength`, `speed`, `mold master`, `living hinge` |
+
+### High impact (strongly recommended)
+
+| Input | Why |
+|-------|-----|
+| **Filament brand + product name** | "PolyMax PETG" vs "generic PETG" changes temps, fan, and volumetric caps significantly |
+| **Vendor data sheet or published print settings** | Manufacturer specs override heuristic defaults — paste key values or link the PDF |
+| **Multiple screenshot angles** | Single-angle views hide overhangs and bridges; top + front + side gives full geometry picture |
+| **Post-processing intent** | "gets XTC coated and sanded" → prioritize layer bonding over surface; "straight to client" → surface finish matters |
+| **Structural requirements** | "needs to hold 20 lb load" or "living hinge, flexes 180° daily" changes wall count and infill pattern |
+
+### Useful when available
+
+| Input | Why |
+|-------|-----|
+| STL file | Allows mesh pre-flight — catches non-manifold geometry and scan artifacts before slicing |
+| Previous print outcome for this filament | Confirms what temps/speeds already worked; avoids repeating failures |
+| Time or filament budget | "needs to finish in under 6 hours" or "can't use more than 80g" — optimizer adjusts trade-offs |
+| AMS slot assignment | Multi-material setups have different retraction and purge requirements |
+
+### What makes a good screenshot
+
+- Slicer view (not model view) — shows actual slice geometry and layer lines
+- Rotate to expose the worst overhangs and bridge spans
+- Include support preview if enabled
+- Zoom in on thin walls, sharp details, or problem areas
+- Multiple angles > one perfect angle
+
+---
+
 ## Optimization Goals
+
+Goals are **starting points, not constraints**. You can mix, stack, or describe anything — Claude
+interprets natural language. The built-in profiles are:
 
 | Goal | What changes |
 |------|-------------|
@@ -95,6 +139,47 @@ feedback: perfect print on vase_optimized.3mf — no warping, clean release
 | `flexibility` | TPU mode: 2 walls, 10–20% gyroid, all speeds 30–40 mm/s |
 | `detail` | 0.12–0.16 mm layers, slow outer wall, Arachne wall generator |
 | `surface finish` | 0.12 mm layers, 25–30 mm/s outer wall, more walls |
+
+### Custom and mixed requests
+
+You're not limited to the table above. Describe the print's actual requirements and Claude will
+compose the right settings from first principles:
+
+**Combining goals:**
+```
+optimize for strength but I need it done in under 8 hours — it's structural but not load-critical
+```
+
+**Use-case driven:**
+```
+mold master — needs to survive 3 pours of silicone and hold fine facial detail. Surface finish
+on the front face only, sides and back are irrelevant.
+```
+
+**Constraint-based:**
+```
+maximize strength under 100g filament budget, 0.4mm nozzle, PETG
+```
+
+**Geometry-specific:**
+```
+thin-wall scan of a skull with known mesh artifacts — be conservative on speeds, prioritize
+layer bonding over surface finish. Tree supports, no interface layers.
+```
+
+**Material + process combo:**
+```
+this gets XTC-3D coated and block sanded to 2000 grit — trade surface finish for bonding.
+Bump temp to upper range. Overhang fan off.
+```
+
+**Failure-informed:**
+```
+last two prints warped at the corners — PETG on textured PEI. Prioritize bed adhesion over everything.
+```
+
+The diff step lets you adjust anything before writing. The approval loop means nothing gets
+applied until you say `approve`.
 
 ---
 
@@ -141,6 +226,46 @@ After every write, `apply_patch.py` runs a full audit and flags suspicious value
 
 ---
 
+## Current Challenges
+
+Known limitations to be aware of:
+
+**Profile inheritance is opaque.**
+Bambu Studio 3MF project files only store *overrides* — values inherited from the base profile
+are not written to `project_settings.config`. If a setting isn't in the 3MF, the optimizer
+reads the profile JSON directly, but the full inheritance chain (custom → base → system) isn't
+always traversed. Some settings may appear as default when they're actually overridden higher up.
+
+**Visual analysis depends on screenshot quality.**
+A single slicer angle can hide overhangs entirely. Claude can't rotate the model — you need to
+provide multiple angles for complex geometry. Organic or scan-derived meshes are especially
+prone to missed overhangs.
+
+**Audit thresholds are heuristic, not material-spec.**
+The warning flags in review mode are based on general PETG/PLA/TPU ranges. Specialty materials
+(ASA, ABS, PA-CF, filled filaments) won't get accurate warnings without a data sheet. Always
+cross-check against the manufacturer's published settings.
+
+**No in-slicer verification.**
+The optimizer writes a valid 3MF but can't open Bambu Studio to confirm the slice looks correct.
+Always re-slice and visually check the layer preview before printing — especially for supports,
+first layer adhesion, and top surface bridging.
+
+**Filament profile must exist in Bambu Studio.**
+The patch writes a `filament_settings_id` reference. If that profile isn't installed in your
+Bambu Studio, it will silently fall back to defaults. Confirm the profile name in your BambuStudio
+user profiles directory before patching.
+
+**Print log grows unbounded.**
+No pruning, search, or summarization built in. Long logs slow down history reads. Periodically
+archive old entries if the log gets unwieldy.
+
+**No AMS multi-material support.**
+Patches target extruder index 0. Multi-material prints with AMS require per-extruder
+settings (`["value1", "value2", ...]`) which the current patch format doesn't manage explicitly.
+
+---
+
 ## Files
 
 | File | Purpose |
@@ -160,6 +285,8 @@ Settings guidance is built in for:
 - **PETG** (including PolyMax PETG): nozzle 235–242°C, bed 70–80°C, fan ≤ 40%
 - **PLA**: nozzle 215–225°C, bed 60–65°C
 - **TPU**: nozzle 220–230°C, bed 30–40°C, minimal retraction
+
+For other materials, paste the data sheet values into your prompt and Claude will use them directly.
 
 ---
 
@@ -192,6 +319,22 @@ python -m pytest tests/ -v
 ```
 
 All tests use a minimal synthetic 3MF — no real print files required.
+
+---
+
+## Changelog
+
+### v0.2 — 2026-05-21
+- `apply_patch.py`: added `review` mode — full settings audit with per-category warning flags
+- Review runs automatically after every `write`
+- Added `patches/polymax_petg_p2s_v2.json` — example patch for Polymaker PolyMax PETG on P2S
+- MIT license
+- README: generic paths, customization guide, required inputs, challenges
+
+### v0.1 — 2026-05-16
+- Initial implementation: `apply_patch.py` with `read` and `write` modes
+- `SKILL.md` orchestrator with `optimize` and `feedback` workflows
+- pytest suite with synthetic 3MF fixtures — no real files required
 
 ---
 
