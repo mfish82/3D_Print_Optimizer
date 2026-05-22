@@ -15,13 +15,14 @@ SO MANY OF US USE AI TO ANALYZE AND GIVE US OPTIMAL SETTINGS FOR OUR PRINTS, THI
 
 ```
 Claude (SKILL.md orchestrator)
-  ├── invoke 3d-print-master skill     ← domain knowledge + pre-flight visual check
+  ├── mesh pre-flight (inline)         ← CAD vs scan, flag issues, no external skill needed
   ├── read print-log.md                ← learn from past failures
   ├── apply_patch.py read <file.3mf>   ← extract current settings
   ├── analyze screenshot + settings    ← generate targeted patch
   ├── show diff → approval loop        ← review before anything is written
   └── apply_patch.py write <file.3mf>  ← write _optimized.3mf
-        └── append to print-log.md     ← auto-log outcome
+        ├── append to print-log.md     ← auto-log outcome
+        └── improvement_agent.md       ← update SKILL.md + patches from outcome
 ```
 
 ---
