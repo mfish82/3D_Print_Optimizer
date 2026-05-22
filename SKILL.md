@@ -313,6 +313,9 @@ Offer to run optimize or feedback mode immediately.
 <!-- Auto-updated by improvement agent. Do not edit manually. -->
 <!-- Format: - [MATERIAL] [setting_key:value] → description (date) -->
 - [PolyMax PETG] [support_type:tree] → interior tree supports toppled on large organic skull geometry (large flat span, insufficient base contact for height), stopped at 14% (2026-05-18)
+- [PolyMax PETG] [support_speed:150mm/s] → poor column bonding at 0.12mm layer height; weak supports contributed to topple at 14% — use 50mm/s (2026-05-22)
+- [PolyMax PETG] [travel_speed:600mm/s] → layer shifting at 0.12mm layer height on tall geometry; P2S resonance — use 200mm/s (2026-05-22)
+- [PolyMax PETG] [hot_plate_temp:55°C] → incorrect for Engineering Plate + PolyMax PETG; correct is 70°C (2026-05-22)
 
 ---
 
@@ -326,6 +329,9 @@ Offer to run optimize or feedback mode immediately.
 - **Bed:** 70°C Engineering Plate (2026-05-18)
 - **Partial-validated (worked in cancelled print):** `wall_loops:6`, `outer_wall_speed:25mm/s`, `layer_height:0.12mm`, `nozzle_temperature:250°C`, first layer adhesion solid (2026-05-18)
 - **Avoid:** `support_type:tree` on large organic flat geometry — tree supports toppled at 14% height
+- **Avoid:** `support_speed` above 80mm/s at 0.12mm layer height — poor column bonding
+- **Avoid:** `travel_speed` above 200mm/s at 0.12mm layer height — layer shifting from resonance
+- **Corrected:** `hot_plate_temp` must be 70°C for Engineering Plate (not 55°C from base profile)
 - **Outcomes:** 1 total — 0 SUCCESS, 0 FAILURE, 0 PARTIAL, 1 CANCELLED
 
 ### Bambu PLA Basic
