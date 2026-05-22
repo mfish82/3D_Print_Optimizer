@@ -37,23 +37,74 @@ Claude (SKILL.md orchestrator)
 
 ## Setup
 
-1. Clone this repo into your Claude Code skills directory:
+### 1. Install Claude Code
 
-   ```
-   %USERPROFILE%\.claude\skills\bambu-optimizer\
-   ```
+Download from [claude.ai/code](https://claude.ai/code). Requires a Claude account.
 
-2. **Create your config.** Copy `config.example.md` to `config.md` and fill in your values:
+### 2. Clone this repo into your skills directory
 
-   ```
-   config.md is gitignored — your paths stay local, never uploaded to GitHub
-   ```
+**Windows:**
+```powershell
+git clone https://github.com/mfish82/3D_Print_Optimizer "%USERPROFILE%\.claude\skills\bambu-optimizer"
+```
 
-   Or just open Claude Code and say `setup bambu-optimizer` — Claude will ask for your values
-   and create `config.md` for you.
+**Mac / Linux:**
+```bash
+git clone https://github.com/mfish82/3D_Print_Optimizer ~/.claude/skills/bambu-optimizer
+```
 
-3. The skill auto-activates in Claude Code when you mention a `.3mf` file or say "optimize".
-   On first run without a config, it will prompt you through setup automatically.
+### 3. Create your config file
+
+Copy the example and fill in your values:
+
+```powershell
+# Windows
+copy "%USERPROFILE%\.claude\skills\bambu-optimizer\config.example.md" "%USERPROFILE%\.claude\skills\bambu-optimizer\config.md"
+```
+
+```bash
+# Mac / Linux
+cp ~/.claude/skills/bambu-optimizer/config.example.md ~/.claude/skills/bambu-optimizer/config.md
+```
+
+Open `config.md` and set these four values:
+
+| Field | What to put |
+|-------|------------|
+| `printer` | Your Bambu model — `P2S`, `X1C`, `A1`, `A1Mini` |
+| `skill_dir` | Full path to the `bambu-optimizer` folder you just cloned |
+| `profile_base` | Your BambuStudio user profile directory (see below) |
+| `print_log` | Full path to a markdown file where print history will be logged (will be created if it doesn't exist) |
+
+**Finding your BambuStudio profile directory:**
+
+Browse to:
+- Windows: `C:\Users\<your name>\AppData\Roaming\BambuStudio\user\`
+- Mac: `~/Library/Application Support/BambuStudio/user/`
+
+Inside you'll see a numeric folder (e.g. `2590880668`) — that full path is your `profile_base`.
+
+**`config.md` is gitignored** — it never gets uploaded to GitHub. Your paths stay local.
+
+### 4. Alternatively — let Claude set it up for you
+
+Open Claude Code and say:
+
+```
+setup bambu-optimizer
+```
+
+Claude will ask for your printer, paths, and write `config.md` for you.
+
+### 5. Verify
+
+Open Claude Code and say:
+
+```
+optimize this for strength: C:\path\to\any.3mf
+```
+
+Claude should detect the skill and ask for a screenshot.
 
 ---
 
