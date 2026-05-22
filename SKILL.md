@@ -156,6 +156,18 @@ Examples:
 ### Step 4 — Save log
 Write updated `print-log.md`. Confirm: `Outcome logged. Will inform future [filament] runs.`
 
+### Step 5 — Invoke improvement agent
+Read `C:\Users\mfish\3D_Print_Optimizer\improvement_agent.md` in full and follow it.
+
+Pass this context to the agent:
+- Material: the filament name from Step 1
+- Goal: the goal from the log entry
+- Outcome type: SUCCESS | FAILURE | PARTIAL (from Step 2)
+- Date: the date from the log entry
+- Outcome line: the full outcome text written in Step 3
+
+The agent runs inline. Do not wait for user input before invoking.
+
 ---
 
 ## Rules
@@ -167,3 +179,17 @@ Write updated `print-log.md`. Confirm: `Outcome logged. Will inform future [fila
 - If visual analysis reveals scan mesh artifacts: invoke 3d-print-master pre-flight before settings work
 - Present diff and wait for approval — never write without 'approve'
 - One clarifying question at a time if needed
+
+---
+
+## Known Failure Patterns
+
+<!-- Auto-updated by improvement agent. Do not edit manually. -->
+<!-- Format: - [MATERIAL] [setting_key:value] → description (date) -->
+
+---
+
+## Material Knowledge
+
+<!-- Auto-updated by improvement agent. Do not edit manually. -->
+<!-- Each material block added after first resolved outcome. -->
