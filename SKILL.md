@@ -137,21 +137,27 @@ Trigger: "feedback: [description] on [filename]" or "that print [worked/failed]"
 Read `H:\ObsidianVault\Cascade-Forge\print-log.md`. Find entry matching the filename.
 
 ### Step 2 — Classify outcome
-- SUCCESS: print met goal, no issues
-- FAILURE: print failed — note what failed and which settings are implicated
-- PARTIAL: some aspects worked, others didn't
+Ask about ALL aspects of the print — do not limit to pass/fail:
+- SUCCESS: print met goal — note settings that worked especially well
+- FAILURE: print failed — note what failed (settings, cause) AND any aspects that printed well
+- PARTIAL: some aspects worked, others didn't — capture both sides explicitly
+- CANCELLED: print stopped early — note why, where it stopped, and which settings are implicated
+
+For FAILURE and CANCELLED: always ask "what looked good before it failed?" to extract validated signals.
 
 ### Step 3 — Append outcome line
 Replace `- Outcome: [PENDING]` with structured result:
 
-Success: `- Outcome: [SUCCESS] — [brief description]`
-Failure: `- Outcome: [FAILURE: <what failed>] [<FILAMENT>] [<key>:<value>] — [description]`
-Partial: `- Outcome: [PARTIAL: <what worked / what failed>] — [description]`
+Success: `- Outcome: [SUCCESS] — [brief description]. Validated: [key settings that worked well]`
+Failure: `- Outcome: [FAILURE: <what failed>] [<FILAMENT>] [<key>:<value>] — [description]. Worked: [aspects that printed well]`
+Partial: `- Outcome: [PARTIAL: <what worked / what failed>] — [description]. Worked: [specifics]. Failed: [specifics with settings]`
+Cancelled: `- Outcome: [CANCELLED: <reason>] [<FILAMENT>] [stopped_at:<point or %>] [<key>:<value if implicated>] — [description]. Worked: [anything that printed well before stop]`
 
 Examples:
-- `- Outcome: [FAILURE: supports] [PETG] [support_type:tree] [spacing:0.20mm] — detached at 40% height`
-- `- Outcome: [SUCCESS] — strong bracket, no warping, supports released cleanly`
-- `- Outcome: [PARTIAL: walls good, top surface rough] — infill too sparse for top layer bridging`
+- `- Outcome: [FAILURE: supports] [PETG] [support_type:tree] [spacing:0.20mm] — detached at 40% height. Worked: walls clean, layer adhesion solid`
+- `- Outcome: [SUCCESS] — strong bracket, no warping, supports released cleanly. Validated: support_top_z_distance:0.25mm, wall_loops:5`
+- `- Outcome: [PARTIAL: walls good, top surface rough] — infill too sparse for top layer bridging. Worked: wall_loops:4 solid. Failed: sparse_infill_density too low`
+- `- Outcome: [CANCELLED: spaghetti at 35%] [PLA] [stopped_at:35%] [layer_height:0.28mm] — layer shifted after support detached. Worked: first 10 layers adhesion excellent`
 
 ### Step 4 — Save log
 Write updated `print-log.md`. Confirm: `Outcome logged. Will inform future [filament] runs.`
@@ -162,7 +168,7 @@ Read `C:\Users\mfish\3D_Print_Optimizer\improvement_agent.md` in full and follow
 Pass this context to the agent:
 - Material: the filament name from Step 1
 - Goal: the goal from the log entry
-- Outcome type: SUCCESS | FAILURE | PARTIAL (from Step 2)
+- Outcome type: SUCCESS | FAILURE | PARTIAL | CANCELLED (from Step 2)
 - Date: the date from the log entry
 - Outcome line: the full outcome text written in Step 3
 
@@ -193,3 +199,10 @@ The agent runs inline. Do not wait for user input before invoking.
 
 <!-- Auto-updated by improvement agent. Do not edit manually. -->
 <!-- Each material block added after first resolved outcome. -->
+
+### Bambu PLA Basic
+- **Nozzle:** 215°C (validated 2026-05-17)
+- **Bed:** not recorded in log entry
+- **Validated settings for accuracy/prototype:** `support_top_z_distance` 0.28mm, `support_critical_regions_only` ON, `support_threshold_angle` 40°, `support_interface_spacing` 1.0mm
+- **Notes:** Heavy Support profile used (AMS slot 2). Support removal successful on organic skull geometry (high-poly scan mesh).
+- **Outcomes:** 1 total — 1 SUCCESS, 0 FAILURE, 0 PARTIAL
