@@ -15,7 +15,7 @@ SO MANY OF US USE AI TO ANALYZE AND GIVE US OPTIMAL SETTINGS FOR OUR PRINTS, THI
 
 ```
 Claude (SKILL.md orchestrator)
-  ├── mesh pre-flight (inline)         ← CAD vs scan, flag issues, no external skill needed
+  ├── mesh pre-flight                  ← CAD vs scan detection, flag mesh issues early
   ├── read print-log.md                ← learn from past failures
   ├── apply_patch.py read <file.3mf>   ← extract current settings
   ├── analyze screenshot + settings    ← generate targeted patch
@@ -334,10 +334,8 @@ All tests use a minimal synthetic 3MF — no real print files required.
 ## Changelog
 
 ### v0.5 — 2026-05-22
-- **Self-contained** — no longer depends on `3d-print-master` skill. All domain knowledge inlined.
-- Added `## Mesh Pre-Flight Reference` section: CAD vs scan detection, scan mesh flags, correct prep order, tool quick-ref
-- Added `## Printer & Filament Baselines` section: P2S specs, PLA/PETG/TPU baseline settings tables
-- Optimize mode Step 1 replaced: inline mesh pre-flight (no external skill invocation)
+- Added mesh pre-flight: CAD vs scan detection, scan mesh flags, correct repair order, tool quick-ref
+- Added printer and filament baselines: P2S specs, PLA/PETG/TPU settings tables
 - Added `references/bambu-studio.md`: Bambu Studio 2.5.3.61 settings reference
 
 ### v0.4 — 2026-05-22
