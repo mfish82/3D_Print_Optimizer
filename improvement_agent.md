@@ -50,8 +50,10 @@ For each matching entry, extract:
 - Outcome line (SUCCESS/FAILURE/PARTIAL + description)
 
 Build two lists:
-- **Validated:** settings in SUCCESS entries
-- **Risky:** settings named in FAILURE/PARTIAL outcome descriptions or key changes where outcome was bad
+- **Validated:** settings in SUCCESS entries, plus settings named in `Worked:` annotations on FAILURE/PARTIAL/CANCELLED entries (tag these as `[partial-validated]`)
+- **Risky:** settings named in FAILURE/PARTIAL/CANCELLED outcome descriptions or key changes where outcome was bad
+
+For CANCELLED entries: also note `stopped_at` value — records at what stage the print failed.
 
 ---
 
@@ -72,6 +74,15 @@ Example:
 - [PolyMax PETG] [support_top_z_distance:0.12mm] → interface bonded to part, required force to remove (2026-05-18)
 ```
 
+### CANCELLED outcome:
+
+Treat implicated settings (named in outcome description or key changes) as Risky — same as FAILURE.
+Note `stopped_at` value in the failure pattern entry if present:
+```
+- [MATERIAL] [setting_key:value] → description, stopped at <point> (YYYY-MM-DD)
+```
+Extract any `Worked:` annotations as `[partial-validated]` — same handling as FAILURE Worked.
+
 ### SUCCESS outcome:
 
 Check if `## Material Knowledge` section contains a block for this material.
@@ -84,8 +95,11 @@ Check if `## Material Knowledge` section contains a block for this material.
 - **Nozzle:** <temp>°C (validated <date>)
 - **Bed:** <temp>°C
 - **Validated settings for <goal>:** <key settings from Key changes>
-- **Outcomes:** <N> total — <N> SUCCESS, <N> FAILURE, <N> PARTIAL
+- **Partial-validated (worked in failed/cancelled prints):** <setting:value, date>
+- **Outcomes:** <N> total — <N> SUCCESS, <N> FAILURE, <N> PARTIAL, <N> CANCELLED
 ```
+
+**For `[partial-validated]` settings:** add to the "Partial-validated" line of the block. These have weaker signal than full SUCCESS — don't use to override risky designations, but do use as supporting evidence.
 
 ### Conflicting signal check (any outcome type):
 
@@ -99,10 +113,11 @@ If a setting appears in both Validated and Risky lists across history:
 ## Step 4 — Auto-Apply Rules
 
 **Apply automatically without user prompt:**
-- Append new entry to `## Known Failure Patterns`
+- Append new entry to `## Known Failure Patterns` (FAILURE and CANCELLED)
 - Add or update material block in `## Material Knowledge`
+- Add partial-validated settings to material block (from `Worked:` annotations)
 - Update numeric values in patch profile within ±20% of the value used in this outcome
-- Create new patch file for a material that now has 2+ resolved outcomes
+- Create new patch file for a material that now has 2+ resolved outcomes (SUCCESS, FAILURE, PARTIAL, or CANCELLED all count)
 
 **Surface to user (one line) and skip:**
 - Conflicting signal detected (same setting, different outcomes)
@@ -182,8 +197,9 @@ One line only, appended after the existing feedback mode confirmation:
 | Outcome | Report format |
 |---------|--------------|
 | SUCCESS | `"Optimizer updated: <material> knowledge reinforced. (<N> outcomes tracked)"` |
-| FAILURE | `"Optimizer updated: failure pattern added for <material> [<setting>]. Will avoid in future runs."` |
-| PARTIAL | `"Optimizer updated: partial outcome logged for <material>. Pattern tracked."` |
+| FAILURE | `"Optimizer updated: failure pattern added for <material> [<setting>]. Extracted <N> partial-validated setting(s). Will avoid in future runs."` |
+| PARTIAL | `"Optimizer updated: partial outcome logged for <material>. Worked: <settings>. Pattern tracked."` |
+| CANCELLED | `"Optimizer updated: cancellation pattern added for <material> [<setting>] stopped at <point>. Extracted <N> partial-validated setting(s)."` |
 | Conflict | `"Conflicting signal on <setting> for <material> — auto-update skipped. Manual review: print-log.md"` |
 
 ---
