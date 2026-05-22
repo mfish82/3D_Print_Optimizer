@@ -67,6 +67,26 @@ Analyze the screenshot:
 ### Step 6 — Generate patch
 Combine: goal, current settings, filament profile, visual analysis, failure history.
 
+**Line-by-line audit (MANDATORY).** Before generating the patch, walk every setting category in
+order and explicitly evaluate each one. Do not skip a category because it "seems fine." Each
+category must produce either a proposed change or an explicit "no change — [reason]" note.
+
+Settings categories to audit in sequence:
+1. **Layer / quality**: layer_height, initial_layer_print_height, initial_layer_line_width
+2. **Walls**: wall_loops, wall_generator (classic/arachne), outer_wall_speed, inner_wall_speed, outer_wall_line_width
+3. **Infill**: sparse_infill_density, sparse_infill_pattern, infill_speed
+4. **Supports**: enable_support, support_type, support_threshold_angle, support_top_z_distance,
+   support_bottom_z_distance, support_interface_spacing, support_critical_regions_only,
+   support_speed, support_interface_speed, support_object_xy_distance
+5. **Temperature**: nozzle_temperature, hot_plate_temp, hot_plate_temp_initial_layer
+6. **Cooling**: fan_max_speed, fan_min_speed, overhang_fan_speed, slow_down_layer_time
+7. **Speeds (top-level)**: outer_wall_speed, sparse_infill_speed, internal_solid_infill_speed,
+   top_surface_speed, travel_speed
+8. **Retraction**: retraction_length, retraction_speed (skip for TPU)
+9. **First layer**: initial_layer_speed, initial_layer_infill_speed
+
+If a key is absent from the 3MF output, check the profile base directory before skipping.
+
 Goal guidance:
 - **strength**: wall_loops 5-6, infill 35-50% gyroid, may reduce layer_height to 0.16
 - **speed**: wall_loops 2-3, infill 10-15% lightning, raise sparse_infill_speed
