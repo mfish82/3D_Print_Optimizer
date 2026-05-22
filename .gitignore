@@ -10,6 +10,9 @@ __pycache__/
 *_patch_*.json
 *.tmp
 
+# User config — contains local paths, never commit
+config.md
+
 # Editor / OS
 .vscode/
 .idea/

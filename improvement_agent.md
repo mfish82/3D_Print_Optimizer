@@ -9,8 +9,10 @@ Invoked automatically after every resolved print outcome. Reads full print histo
 per-material patterns, and updates SKILL.md guidance and patch profiles in place. Commits all
 changes to the GitHub repo.
 
-**Repo / skill path:** `C:\Users\mfish\3D_Print_Optimizer\` (junction: `C:\Users\mfish\.claude\skills\bambu-optimizer\`)
-**Print log:** `H:\ObsidianVault\Cascade-Forge\print-log.md`
+**Config:** Read `config.md` in the skill directory before running. Use `{skill_dir}` and `{print_log}` from it for all paths below.
+
+**Skill dir:** `{skill_dir}`
+**Print log:** `{print_log}`
 
 ---
 
@@ -28,9 +30,9 @@ Feedback mode passes these values when invoking this agent:
 ## Step 1 — Read Current State
 
 Read all three sources in full:
-1. `H:\ObsidianVault\Cascade-Forge\print-log.md`
-2. `C:\Users\mfish\3D_Print_Optimizer\SKILL.md`
-3. `C:\Users\mfish\3D_Print_Optimizer\patches\<material_slug>.json` if it exists
+1. `{print_log}`
+2. `{skill_dir}\SKILL.md`
+3. `{skill_dir}\patches\<material_slug>.json` if it exists
 
 **Material slug rule:** lowercase, spaces to underscores, remove special chars.
 - "PolyMax PETG" → `polymax_petg`
@@ -178,7 +180,7 @@ Create `patches/<material_slug>.json`:
 ## Step 7 — Commit Changes
 
 ```bash
-cd "C:\Users\mfish\3D_Print_Optimizer"
+cd "{skill_dir}"
 git add SKILL.md patches/
 git commit -m "chore(optimizer): update <material_slug> <what changed> [<OUTCOME_TYPE> <date>]"
 ```

@@ -43,15 +43,17 @@ Claude (SKILL.md orchestrator)
    %USERPROFILE%\.claude\skills\bambu-optimizer\
    ```
 
-2. Edit `SKILL.md` and update the three path variables near the top:
+2. **Create your config.** Copy `config.example.md` to `config.md` and fill in your values:
 
    ```
-   Script:    path to apply_patch.py
-   Print log: path to your print-log.md
-   Profiles:  path to your BambuStudio user profile directory
+   config.md is gitignored — your paths stay local, never uploaded to GitHub
    ```
+
+   Or just open Claude Code and say `setup bambu-optimizer` — Claude will ask for your values
+   and create `config.md` for you.
 
 3. The skill auto-activates in Claude Code when you mention a `.3mf` file or say "optimize".
+   On first run without a config, it will prompt you through setup automatically.
 
 ---
 
@@ -332,6 +334,13 @@ All tests use a minimal synthetic 3MF — no real print files required.
 ---
 
 ## Changelog
+
+### v0.6 — 2026-05-22
+- All machine-specific paths removed from tracked files (`SKILL.md`, `improvement_agent.md`)
+- Added `config.md` (gitignored) — user-local paths, printer, and profile base
+- Added `config.example.md` — template with instructions for new installs
+- Added `## MODE: setup` — Claude creates `config.md` automatically on first run
+- `{skill_dir}`, `{print_log}`, `{profile_base}`, `{printer}` tokens throughout runtime files
 
 ### v0.5 — 2026-05-22
 - Added mesh pre-flight: CAD vs scan detection, scan mesh flags, correct repair order, tool quick-ref

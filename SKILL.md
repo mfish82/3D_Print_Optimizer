@@ -2,20 +2,25 @@
 name: bambu-optimizer
 description: >
   Optimize Bambu Studio 3MF project files for specific print goals (strength, speed, flexibility,
-  detail, surface finish). Use when Mike provides a 3MF file and screenshot from Bambu Studio,
-  or gives feedback about a past print outcome. Triggers on: "optimize", "improve settings",
+  detail, surface finish). Use for any request involving a .3mf file, screenshot from Bambu Studio,
+  or feedback about a past print outcome. Triggers on: "optimize", "improve settings",
   "print settings", any .3mf file reference, post-print feedback ("supports failed", "good print").
   Always use this skill for 3MF optimization requests.
 ---
 
 # Bambu Optimizer
 
-Optimize 3MF project files for Mike's Cascade Forge P2S printer. Combine visual analysis, print
-history, and domain expertise to propose and apply settings improvements.
+Optimize 3MF project files for your Bambu printer. Combine visual analysis, print history, and
+domain expertise to propose and apply settings improvements.
 
-**Script:** `C:\Users\mfish\.claude\skills\bambu-optimizer\apply_patch.py`
-**Print log:** `H:\ObsidianVault\Cascade-Forge\print-log.md`
-**Profile base:** `C:\Users\mfish\AppData\Roaming\BambuStudio\user\2590880668\`
+**Config:** Read `config.md` in this skill directory at the start of every session. Substitute
+`{skill_dir}`, `{print_log}`, `{profile_base}`, and `{printer}` throughout with the values defined
+there. If `config.md` is missing, run `## MODE: setup` before any other mode.
+
+**Script:** `{skill_dir}\apply_patch.py`
+**Print log:** `{print_log}`
+**Profile base:** `{profile_base}`
+**Printer:** `{printer}`
 
 ---
 
@@ -99,7 +104,7 @@ Determine from the screenshot whether the mesh is CAD or scan-derived.
 Do not invoke any external skill. All domain knowledge is in this file.
 
 ### Step 2 — Read current settings
-Run: `python "C:\Users\mfish\.claude\skills\bambu-optimizer\apply_patch.py" read "<3mf_path>"`
+Run: `python "{skill_dir}\apply_patch.py" read "<3mf_path>"`
 
 Parse JSON output. Track these keys at minimum:
 - `filament_settings_id` — filament profile name (array, use index 0)
@@ -121,7 +126,7 @@ Show: `Detected filament: [filament_settings_id[0]]. Confirm to continue, or can
 Wait for response. Cancel = exit cleanly with no files written. Confirm = proceed.
 
 ### Step 4 — Read print history
-Read `H:\ObsidianVault\Cascade-Forge\print-log.md` in full.
+Read `{print_log}` in full.
 Find entries with same filament or similar filename. Note any `[FAILURE]` tags and the settings
 they name. This informs recommendations — if a setting failed before, avoid repeating it.
 
@@ -198,12 +203,12 @@ Type 'approve', 'cancel', or describe adjustments.
 ### Step 9 — Write optimized 3MF
 Write the patch dict to a temp JSON file, then run:
 ```
-python "C:\Users\mfish\.claude\skills\bambu-optimizer\apply_patch.py" write "<3mf_path>" "<temp_patch_path>"
+python "{skill_dir}\apply_patch.py" write "<3mf_path>" "<temp_patch_path>"
 ```
 Confirm output path from stdout. Delete the temp patch file.
 
 ### Step 10 — Auto-log
-Append to `H:\ObsidianVault\Cascade-Forge\print-log.md`:
+Append to `{print_log}`:
 
 ```
 ## [YYYY-MM-DD] - [original_filename]
@@ -214,7 +219,7 @@ Append to `H:\ObsidianVault\Cascade-Forge\print-log.md`:
 - Outcome: [PENDING]
 ```
 
-Tell Mike: `Written: [output path]. Logged to Cascade Forge.`
+Confirm: `Written: [output path]. Logged.`
 
 ---
 
@@ -223,7 +228,7 @@ Tell Mike: `Written: [output path]. Logged to Cascade Forge.`
 Trigger: "feedback: [description] on [filename]" or "that print [worked/failed]"
 
 ### Step 1 — Find log entry
-Read `H:\ObsidianVault\Cascade-Forge\print-log.md`. Find entry matching the filename.
+Read `{print_log}`. Find entry matching the filename.
 
 ### Step 2 — Classify outcome
 Ask about ALL aspects of the print — do not limit to pass/fail:
@@ -252,7 +257,7 @@ Examples:
 Write updated `print-log.md`. Confirm: `Outcome logged. Will inform future [filament] runs.`
 
 ### Step 5 — Invoke improvement agent
-Read `C:\Users\mfish\3D_Print_Optimizer\improvement_agent.md` in full and follow it.
+Read `{skill_dir}\improvement_agent.md` in full and follow it.
 
 Pass this context to the agent:
 - Material: the filament name from Step 1
@@ -262,6 +267,32 @@ Pass this context to the agent:
 - Outcome line: the full outcome text written in Step 3
 
 The agent runs inline. Do not wait for user input before invoking.
+
+---
+
+## MODE: setup
+
+Trigger: `config.md` is missing from the skill directory, or user says "setup".
+
+### Step 1 — Detect skill directory
+The skill directory is wherever SKILL.md was loaded from. Confirm the path.
+
+### Step 2 — Gather config values
+Ask the following questions (one message, all at once):
+1. What Bambu printer model do you have? (e.g. P2S, X1C, A1, A1Mini)
+2. Where is your BambuStudio user profile directory?
+   - Windows default: `C:\Users\<name>\AppData\Roaming\BambuStudio\user\<numeric_id>`
+   - Browse to that path and paste the full directory
+3. Where should print history be logged?
+   - Paste a full path to an existing markdown file, or a new path to create one
+
+### Step 3 — Create config.md
+Write `config.md` to the skill directory with the values from Step 2.
+Use `config.example.md` as the template format.
+
+### Step 4 — Confirm and continue
+Confirm: `Config saved. Ready to optimize.`
+Offer to run optimize or feedback mode immediately.
 
 ---
 
