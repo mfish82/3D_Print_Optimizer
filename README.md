@@ -4,6 +4,9 @@ A Claude Code skill + Python tool that reads Bambu Studio `.3mf` project files, 
 print settings against a screenshot and your print history, proposes optimized settings as
 a human-readable diff, and writes an `_optimized.3mf` on approval.
 
+***NOTE: I JUST STARTED TO BUILD THIS OUT AND IS ONLY TUNES FOR BAMBU STUDIO WITH PLANS TO TEST ON ORCA SLICER AS WELL. OPEN TO FEEDBACK, FORKS, UPDATES, WHATEVER.
+SO MANY OF US USE AI TO ANALYZE AND GIVE US OPTIMAL SETTINGS, THIS CREATES A SELF IMPROVING SKILL TO AID IN THAT EFFORT. THIS DOES REQUIRE THE USE OF A NOTE TAKING/BRAIN STYLE APP LIKE OBSIDIAN***
+
 **No third-party dependencies** — Python stdlib only (`zipfile`, `json`, `shutil`, `tempfile`).
 
 ---
