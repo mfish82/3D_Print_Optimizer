@@ -312,6 +312,7 @@ Offer to run optimize or feedback mode immediately.
 
 <!-- Auto-updated by improvement agent. Do not edit manually. -->
 <!-- Format: - [MATERIAL] [setting_key:value] → description (date) -->
+- [PolyMax PETG] [support_type:tree] → interior tree supports toppled on large organic skull geometry (large flat span, insufficient base contact for height), stopped at 14% (2026-05-18)
 
 ---
 
@@ -319,6 +320,13 @@ Offer to run optimize or feedback mode immediately.
 
 <!-- Auto-updated by improvement agent. Do not edit manually. -->
 <!-- Each material block added after first resolved outcome. -->
+
+### Polymaker PolyMax PETG
+- **Nozzle:** 250°C (attempted 2026-05-18 — partial-validated only)
+- **Bed:** 70°C Engineering Plate (2026-05-18)
+- **Partial-validated (worked in cancelled print):** `wall_loops:6`, `outer_wall_speed:25mm/s`, `layer_height:0.12mm`, `nozzle_temperature:250°C`, first layer adhesion solid (2026-05-18)
+- **Avoid:** `support_type:tree` on large organic flat geometry — tree supports toppled at 14% height
+- **Outcomes:** 1 total — 0 SUCCESS, 0 FAILURE, 0 PARTIAL, 1 CANCELLED
 
 ### Bambu PLA Basic
 - **Nozzle:** 215°C (validated 2026-05-17)
